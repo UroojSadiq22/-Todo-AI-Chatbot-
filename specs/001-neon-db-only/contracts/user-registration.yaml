@@ -1,0 +1,100 @@
+openapi: 3.0.0
+info:
+  title: User Registration API
+  description: API for user registration that stores data in Neon PostgreSQL
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Development server
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      description: Creates a new user account and stores it in Neon PostgreSQL database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Bad request - invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - user already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+components:
+  schemas:
+    UserRegistrationRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          description: Unique username for the user
+          example: johndoe
+          minLength: 3
+          maxLength: 50
+        email:
+          type: string
+          format: email
+          description: Valid email address
+          example: john@example.com
+        password:
+          type: string
+          format: password
+          description: User password
+          minLength: 8
+          example: securePassword123
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the user
+          example: 123e4567-e89b-12d3-a456-426614174000
+        username:
+          type: string
+          description: Username of the user
+          example: johndoe
+        email:
+          type: string
+          format: email
+          description: Email of the user
+          example: john@example.com
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the user was created
+          example: "2023-10-20T10:00:00Z"
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message
+          example: User already exists
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

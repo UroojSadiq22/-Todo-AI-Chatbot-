@@ -1,0 +1,106 @@
+openapi: 3.0.0
+info:
+  title: Authentication API
+  version: 1.0.0
+  description: API for user authentication including registration
+
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      description: Creates a new user account with the provided credentials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+      responses:
+        '200':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '422':
+          description: Validation error occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    RegistrationRequest:
+      type: object
+      required:
+        - email
+        - username
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "user@example.com"
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          description: User's chosen username
+          example: "johndoe"
+        password:
+          type: string
+          minLength: 8
+          description: User's password
+          example: "securePassword123"
+
+    RegistrationResponse:
+      type: object
+      required:
+        - id
+        - email
+        - username
+        - success
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the created user
+          example: "user_123456789"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "user@example.com"
+        username:
+          type: string
+          description: User's username
+          example: "johndoe"
+        success:
+          type: boolean
+          description: Indicates if the registration was successful
+          example: true
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message describing the issue
+          example: "Email is already in use"
+        field_errors:
+          type: object
+          description: Specific field validation errors
+          additionalProperties:
+            type: string
+          example:
+            email: "Email is already in use"
+            password: "Password must be at least 8 characters"

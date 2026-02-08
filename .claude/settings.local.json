@@ -16,7 +16,26 @@
       "Bash(git checkout -b 2-fix-registration-422)",
       "Bash(.specify/scripts/powershell/setup-plan.ps1 -Json)",
       "Bash(.specify/scripts/powershell/check-prerequisites.ps1 -Json)",
-      "Bash(.specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks)"
+      "Bash(.specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks)",
+      "Bash(.specify/scripts/powershell/create-new-feature.ps1:*)",
+      "Bash(.specify/scripts/bash/create-new-feature.sh:*)",
+      "Bash(git checkout:*)",
+      "Bash(pwsh -NoProfile -ExecutionPolicy Bypass -Command \".specify/scripts/powershell/setup-plan.ps1 -Json\")",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \".specify/scripts/powershell/setup-plan.ps1 -Json\")",
+      "Bash(dir:*)",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \".specify/scripts/powershell/update-agent-context.ps1 -AgentType claude\")",
+      "Bash(bash .specify/scripts/bash/create-phr.sh:*)",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json\")",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks\")",
+      "Bash(alembic upgrade:*)",
+      "Bash(alembic current:*)",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \".specify/scripts/powershell/create-new-feature.ps1 -Json -Number 2 -ShortName ''openai-agents-mcp-integration'' ''Phase 3 Part 2 - OpenAI Agents SDK with MCP Tools Integration''\")",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \".specify/scripts/powershell/create-new-feature.ps1 -Number 2 -ShortName ''openai-agents-mcp-integration'' -Description ''Phase 3 Part 2 - OpenAI Agents SDK with MCP Tools Integration'' -Json\")",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"C:\\\\Users\\\\LAPTOP\\\\speckitplus-projects\\\\evolution-of-todo-H2\\\\todo-app-phase3\\\\.specify\\\\scripts\\\\powershell\\\\update-agent-context.ps1 -AgentType claude\":*)",
+      "Bash(.specify/scripts/bash/create-phr.sh:*)",
+      "Bash(echo:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/check-prerequisites.ps1:*)",
+      "Bash(powershell:*)"
     ]
   }
 }

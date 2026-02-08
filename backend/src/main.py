@@ -10,6 +10,7 @@ from sqlalchemy import text
 from sqlmodel import SQLModel
 from .api.auth_router import router as auth_router
 from .api.todo_router import router as todo_router
+from .api.chat import router as chat_router
 from .config import settings
 from .database import async_engine
 
@@ -63,6 +64,7 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
     app.include_router(todo_router, prefix="/api/todos", tags=["todos"])
+    app.include_router(chat_router, prefix="/api", tags=["chat"])
 
     @app.get("/")
     def read_root():

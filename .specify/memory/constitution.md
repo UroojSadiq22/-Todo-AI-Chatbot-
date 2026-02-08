@@ -1,105 +1,103 @@
-<!-- SYNC IMPACT REPORT:
-Version change: N/A (initial version) → 1.0.0
-Modified principles: N/A
-Added sections: All sections added based on user requirements
-Removed sections: N/A
+<!-- SYNC IMPACT REPORT
+Version change: 1.0.0 → 1.1.0
+Modified principles: None (new principles added)
+Added sections: Core Principles (conversational-first, stateless, MCP-driven, spec-driven)
+Removed sections: None
 Templates requiring updates:
-- ✅ .specify/templates/plan-template.md - reviewed and aligned
-- ✅ .specify/templates/spec-template.md - reviewed and aligned
-- ✅ .specify/templates/tasks-template.md - reviewed and aligned
-- ✅ .specify/templates/commands/*.md - reviewed and aligned
-- ✅ README.md - to be created with architecture overview
+- ✅ .specify/templates/plan-template.md (updated)
+- ✅ .specify/templates/spec-template.md (updated)
+- ✅ .specify/templates/tasks-template.md (updated)
+- ✅ .specify/templates/commands/sp.constitution.md (updated)
+Added new section: Technology Stack and Constraints
 Follow-up TODOs: None
 -->
-
-# The Evolution of Todo – Phase II Constitution
+# Todo App Phase 3 - AI Chatbot Constitution
 
 ## Core Principles
 
+### Conversational-First
+Natural language interaction over traditional UI controls; All features must be accessible via conversational commands; Design for chat-first experiences where buttons are fallback, not primary interface.
+
+### Stateless Architecture
+Zero server memory between requests; Database stores all application state; Server restarts must preserve all user data and conversation history without loss.
+
+### MCP-Driven Communication
+Standardized tools for AI-to-app communication using official MCP SDK; All backend operations exposed as MCP tools; Strict adherence to MCP specifications and protocols.
+
 ### Spec-Driven Development
-Every feature must originate from a written specification. No feature is implemented without a corresponding spec file. Specs define truth, code follows. All changes must be traceable: Spec → Prompt → Plan → Implementation.
+Write specifications first, then implement; All features documented before coding begins; Implementation must match spec exactly, spec changes require approval.
 
-### Agentic AI Workflow
-Plan → Tasks → Implement → Iterate workflow is mandatory. AI tools (Claude via Qwen) are used as implementation agents. Prompts and iterations serve as evidence of agentic development.
+### Type-Safe Development
+Type hints required on all Python functions; Static type checking enforced; Error handling with try-except on all database and AI operations; Comprehensive logging for debugging and monitoring.
 
-### Tool Agnosticism
-Workflow over tooling; Bonsai not required. Focus on process rather than specific tools. The agentic workflow can be implemented with various toolsets.
+### Security-First Approach
+JWT validation required on every request; User ID validation to prevent cross-user data access; Parameterized queries only to prevent injection; API keys stored in environment variables exclusively.
 
-### User Isolation & Security First
-Security is the top priority in all implementations. User data must be isolated and protected. No cross-user data access is allowed. JWT validation required on every request.
+## Technology Stack and Constraints
 
-### Clean Architecture & Maintainability
-Maintain clear separation between frontend and backend. Follow monorepo structure with required folders: /frontend, /backend, /specs. Code must be maintainable and well-structured.
+### Mandatory Technologies
+**Frontend**: OpenAI ChatKit only (no custom chat UI)
+**AI**: OpenAI Agents SDK only (no direct API calls)
+**Tools**: Official MCP SDK (Python) only (no LangChain)
+**Backend**: FastAPI + SQLModel + Neon DB only
+**Authentication**: Better Auth JWT (leverage existing)
 
-### Minimal Manual Coding
-AI-assisted generation is preferred over manual coding. Minimize manual intervention while maintaining quality and correctness.
+### Prohibited Technologies
+- Custom chat interfaces (must use ChatKit)
+- LangChain or alternative AI frameworks
+- Direct OpenAI API calls (must use Agents SDK)
+- Stateful session management
+- Hardcoded credentials or secrets
 
-## Architecture Constraints
+### Database Schema Requirements
+**Preserved Tables**: users, tasks (never modify)
+**New Required Tables**:
+- conversations (id, user_id, created_at, updated_at)
+- messages (id, conversation_id, user_id, role, content, created_at)
 
-- Monorepo structure is mandatory
-- Frontend and backend must be clearly separated
-- Required folders:
-  - /frontend (Next.js App Router)
-  - /backend (FastAPI)
-  - /specs (Spec-Kit managed)
-- Shared assumptions must be documented in root CLAUDE.md
+### MCP Tools Specification (Exactly 5 Required)
+1. add_task(user_id, title, description?) - Create new tasks
+2. list_tasks(user_id, status?) - Retrieve task lists
+3. complete_task(user_id, task_id) - Mark tasks as complete
+4. delete_task(user_id, task_id) - Remove tasks
+5. update_task(user_id, task_id, title?, description?) - Modify existing tasks
 
-## Technology Constraints
+### Immutable Request Flow
+```
+User → ChatKit → POST /api/{user_id}/chat
+→ Validate JWT → Fetch history from DB
+→ Save user message → OpenAI Agent + MCP tools
+→ Save assistant message → Return response
+→ Discard state (stateless!)
+```
 
-Frontend:
-- Next.js 16+ (App Router)
-- TypeScript
-- Tailwind CSS
+## Development Standards
 
-Backend:
-- Python 3.13+
-- FastAPI
-- SQLModel ORM
+### Code Quality Requirements
+- Type hints: Required on all Python functions
+- Error handling: Try-except blocks on all DB/AI operations
+- Logging: INFO level for actions, ERROR for failures
+- Testing: At least one unit test per MCP tool
+- Documentation: Inline comments for complex logic
 
-Database:
-- Neon Serverless PostgreSQL
+### Performance Standards
+- Response time: Less than 3 seconds for typical requests
+- Command interpretation: 90%+ accuracy rate
+- Database operations: Optimized with proper indexing
+- Memory usage: Minimal during request processing
 
-Authentication:
-- Better Auth (Frontend)
-- JWT-based authentication
-- Shared secret via environment variables
-
-## API Rules
-
-- All endpoints must be RESTful
-- All endpoints must be protected via JWT
-- No unauthenticated access allowed
-- Task ownership must be enforced at API level
-- Backend must never trust client-sent user IDs without JWT validation
-
-## Security Standards
-
-- JWT must be validated on every request
-- User identity must be derived from token, not request body
-- Cross-user data access is strictly forbidden
-- Unauthorized requests must return HTTP 401
-
-## Implementation Constraints
-
-- No direct database access from frontend
-- All frontend data access goes through API client
-- Backend filters all queries by authenticated user
-- Error handling must be explicit and consistent
-
-## Documentation Requirements
-
-- README.md must include:
-  - Setup instructions
-  - Architecture overview
-  - Authentication flow explanation
-- CLAUDE.md files must exist at:
-  - Root
-  - /frontend
-  - /backend
-- CLAUDE.md must instruct AI how to read and apply specs
+### Success Criteria
+- Task operations via chat: Add/list/complete/delete/update
+- Conversation context: Maintained across requests
+- Data persistence: Survives server restarts
+- Authentication: Validated on every request
+- Performance: Meets response time requirements
+- Documentation: Complete README, CLAUDE.md, and templates
 
 ## Governance
 
-This constitution applies ONLY to Phase II of the Hackathon II project. Phase I was completed separately in a different folder. Phase II starts from a clean repository state. No code or structure is reused from Phase I. All Phase II requirements must be implemented via specs. The workflow follows Spec-Driven Development (Specs define truth, code follows), Agentic AI Workflow (Plan → Tasks → Implement → Iterate), and Tool Agnosticism. Every feature must originate from a written specification with all changes being traceable: Spec → Prompt → Plan → Implementation.
+All development must comply with these constitutional principles. Amendments require explicit approval and migration planning. Code reviews must verify compliance with all technology stack constraints and architectural decisions. Any deviation from mandated technologies or prohibited tools requires constitutional amendment first.
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-08 | **Last Amended**: 2026-01-08
+Version control must track all changes to ensure reproducible builds. Automated testing must cover all MCP tools before merging. Security validation must occur on every deployment to verify JWT compliance and user isolation.
+
+**Version**: 1.1.0 | **Ratified**: 2026-02-08 | **Last Amended**: 2026-02-08

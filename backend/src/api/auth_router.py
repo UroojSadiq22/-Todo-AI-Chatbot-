@@ -114,7 +114,7 @@ async def login_user(
             )
 
         # Create JWT token for the authenticated user
-        access_token_expires = timedelta(minutes=15)  # 15 minutes for security
+        access_token_expires = timedelta(minutes=35)  # 15 minutes for security
         token_data = {"sub": str(user.id), "email": user.email}
         access_token = create_token(
             data=token_data, expires_delta=access_token_expires

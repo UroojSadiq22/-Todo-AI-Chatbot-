@@ -35,7 +35,13 @@
       "Bash(.specify/scripts/bash/create-phr.sh:*)",
       "Bash(echo:*)",
       "Bash(powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/check-prerequisites.ps1:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \".specify/scripts/powershell/create-new-feature.ps1 -Json -Number 003 -ShortName ''chatkit-frontend-integration'' ''Phase 3 Part 3: OpenAI ChatKit Frontend Integration''\")",
+      "WebSearch",
+      "WebFetch(domain:platform.openai.com)",
+      "WebFetch(domain:sdk.vercel.ai)",
+      "Bash(ls:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

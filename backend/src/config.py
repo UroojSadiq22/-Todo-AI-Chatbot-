@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     # Database (Neon PostgreSQL only) - single DATABASE_URL configuration
     DATABASE_URL: str
 
+    GROQ_API_KEY: str
     DB_ECHO: bool = False
 
     # JWT

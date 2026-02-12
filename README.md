@@ -8,16 +8,21 @@ A secure, multi-user todo application built with Next.js, FastAPI, and PostgreSQ
 - Create, read, update, and delete todos
 - Toggle completion status
 - User-specific todo isolation
-- Responsive UI that works on mobile, tablet, and desktop
+- **AI-Powered Chat Interface** - Conversational task management with natural language commands
+- **Intelligent Task Operations** - Add, update, complete, and delete tasks through chat
+- **Persistent Conversations** - Chat history saved across sessions
+- Responsive UI that works on mobile, tablet, and desktop (320px - 1920px)
 - JWT-based authentication
 - Secure API endpoints
 
 ## Tech Stack
 
-- **Frontend**: Next.js 16+, TypeScript, Tailwind CSS
-- **Backend**: FastAPI, Python 3.13+
-- **Database**: PostgreSQL (with SQLModel ORM)
+- **Frontend**: Next.js 16+, React 19+, TypeScript, Tailwind CSS
+- **Backend**: FastAPI, Python 3.13+, OpenAI Agents SDK
+- **Database**: PostgreSQL/Neon Serverless (with SQLModel ORM)
+- **AI Integration**: OpenAI GPT-4 with MCP (Model Context Protocol) tools
 - **Authentication**: JWT-based with password hashing
+- **API Client**: Axios with JWT interceptors
 - **Styling**: Tailwind CSS for responsive design
 
 ## Setup
@@ -67,9 +72,11 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/todo_app
 SECRET_KEY=your-super-secret-key-change-this-in-production
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
+OPENAI_API_KEY=sk-your-openai-api-key-here
+MCP_SERVER_URL=http://localhost:5000
 
 # Frontend Configuration
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 ## Running the Application
@@ -89,7 +96,24 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api
    npm run dev
    ```
 
-3. Visit `http://localhost:3000` in your browser.
+3. In another terminal, start the MCP server (for AI tool integration):
+   ```bash
+   cd mcp-server
+   python -m uvicorn main:app --reload --port 5000
+   ```
+
+4. Visit `http://localhost:3000` in your browser.
+
+### Using the Chat Feature
+
+1. Navigate to `/chat` after logging in
+2. Type natural language commands to manage your tasks:
+   - "Add a task to prepare presentation"
+   - "Show me all my pending tasks"
+   - "Mark task 3 as completed"
+   - "Update task 2 description to include deadline"
+3. The AI assistant will execute the commands and provide confirmations
+4. Your conversation history persists across sessions
 
 ### Production
 
@@ -115,6 +139,19 @@ docker-compose up --build
 - `PATCH /api/todos/{id}/toggle` - Toggle completion status
 - `DELETE /api/todos/{id}` - Delete a specific todo
 
+### Chat (AI Assistant)
+
+- `POST /api/{user_id}/chat` - Send a message to the AI assistant
+- `GET /api/{user_id}/conversations/{conversation_id}/messages` - Get conversation history
+- `GET /api/{user_id}/conversations` - List all user conversations
+
+The AI assistant can perform task operations through natural language:
+- **Add tasks**: "Add a task to buy groceries"
+- **List tasks**: "Show me my tasks" or "What do I need to do?"
+- **Complete tasks**: "Mark task 5 as complete"
+- **Update tasks**: "Change the title of task 3 to 'Buy milk'"
+- **Delete tasks**: "Delete task 7"
+
 ## Security
 
 - All API endpoints require JWT authentication
@@ -129,8 +166,8 @@ todo-app/
 ├── backend/                 # FastAPI backend
 │   ├── src/
 │   │   ├── models/         # Database models
-│   │   ├── services/       # Business logic
-│   │   ├── api/            # API routes
+│   │   ├── services/       # Business logic (ConversationService, etc.)
+│   │   ├── api/            # API routes (todos, chat, auth)
 │   │   ├── auth/           # Authentication utilities
 │   │   ├── database/       # Database configuration
 │   │   └── utils/          # Utility functions
@@ -138,11 +175,21 @@ todo-app/
 ├── frontend/               # Next.js frontend
 │   ├── src/
 │   │   ├── app/           # Next.js app router pages
-│   │   ├── components/    # Reusable UI components
-│   │   ├── services/      # API service clients
-│   │   └── types/         # TypeScript type definitions
+│   │   │   └── chat/      # Chat page route
+│   │   ├── components/    # Reusable UI components (ChatInterface, etc.)
+│   │   ├── hooks/         # Custom React hooks (useChat, useAuth)
+│   │   ├── lib/           # API clients (chatApi, errorHandler)
+│   │   ├── services/      # API service clients (auth)
+│   │   └── types/         # TypeScript type definitions (chat types)
 │   └── tests/              # Frontend tests
-├── specs/                  # Project specifications
+├── mcp-server/             # MCP tool server for AI integration
+├── specs/                  # Project specifications & design docs
+│   └── 003-chatkit-frontend-integration/
+│       ├── spec.md        # Feature specification
+│       ├── plan.md        # Implementation plan
+│       ├── tasks.md       # Task breakdown
+│       ├── data-model.md  # Data structures
+│       └── contracts/     # API contracts
 └── docker-compose.yml      # Docker configuration
 ```
 

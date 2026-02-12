@@ -2,6 +2,7 @@
 
 import sys
 import os
+from uuid import UUID
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
 
 from typing import Dict, Any
@@ -10,15 +11,15 @@ from sqlmodel import select
 from datetime import datetime
 
 from backend.src.models.todo import Todo
-from utils.db_utils import get_db_session
-from utils.response_utils import success_response, error_response
+from src.utils.db_utils import get_db_session
+from src.utils.response_utils import success_response, error_response
 
 logger = logging.getLogger(__name__)
 
 
 async def complete_task_tool(
     user_id: str,
-    task_id: int
+    task_id: str
 ) -> Dict[str, Any]:
     """
     Mark a task as completed.
@@ -54,10 +55,17 @@ async def complete_task_tool(
     """
     try:
         async with get_db_session() as session:
+
+            # Convert task_id to UUID
+            try:
+                task_uuid = UUID(str(task_id)) if not isinstance(task_id, UUID) else task_id
+            except ValueError:
+                return error_response(f"Invalid task ID format: {task_id}", 400)
+                
             # Fetch task with user_id filter (ownership validation)
             result = await session.execute(
                 select(Todo).where(
-                    Todo.id == task_id,
+                    Todo.id == task_uuid,
                     Todo.user_id == user_id  # Critical security filter
                 )
             )

@@ -126,7 +126,7 @@ Implement security measures and validation to ensure proper user isolation and d
 - [X] T047 Implement JWT validation middleware for the chat endpoint
 - [X] T048 Validate user_id parameter matches authenticated user in the JWT token
 - [X] T049 Add proper parameterized queries to prevent SQL injection in all database operations
-- [ ] T050 Add input sanitization for user messages to prevent injection attacks
+- [X] T050 Add input sanitization for user messages to prevent injection attacks
 
 ## Phase 9: Polish & Cross-Cutting Concerns
 
@@ -144,7 +144,7 @@ Complete the implementation with proper logging, performance optimization, and t
 - [X] T057 Update main.py to include the chat API routes
 - [X] T058 Add proper error responses with appropriate HTTP status codes
 - [ ] T059 Document the API endpoints with OpenAPI/Swagger documentation
-- [ ] T060 Update README with instructions for running the chat endpoint
+- [X] T060 Update README with instructions for running the chat endpoint
 
 ## Dependencies
 

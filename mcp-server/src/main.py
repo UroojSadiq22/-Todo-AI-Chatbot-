@@ -4,13 +4,15 @@ This module initializes the MCP server with FastAPI and registers all MCP tools.
 The server runs on port 5000 and exposes 5 MCP tools for task management.
 """
 
+from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import os
 from dotenv import load_dotenv
+from pydantic import BaseModel
 
-from tools import (
+from .tools import (
     add_task_tool,
     list_tasks_tool,
     complete_task_tool,
@@ -20,6 +22,30 @@ from tools import (
 
 # Load environment variables
 load_dotenv()
+
+class AddTaskRequest(BaseModel):
+    user_id: str
+    title: str
+    description: Optional[str] = None
+
+class ListTasksRequest(BaseModel):
+    user_id: str
+    status: Optional[str] = "all"
+
+class CompleteTaskRequest(BaseModel):
+    user_id: str
+    task_id: str
+
+class UpdateTaskRequest(BaseModel):
+    user_id: str
+    task_id: str
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+class DeleteTaskRequest(BaseModel):
+    user_id: str
+    task_id: str
+
 
 # Configure logging
 logging.basicConfig(
@@ -74,33 +100,42 @@ async def root():
 
 
 @app.post("/tools/add_task")
-async def add_task_endpoint(user_id: str, title: str, description: str = None):
+async def add_task_endpoint(request: AddTaskRequest):
     """Endpoint for add_task MCP tool."""
-    return await add_task_tool(user_id, title, description)
+    return await add_task_tool(
+        user_id=request.user_id, 
+        title=request.title, 
+        description=request.description
+        )
 
 
 @app.post("/tools/list_tasks")
-async def list_tasks_endpoint(user_id: str, status: str = None):
+async def list_tasks_endpoint(request: ListTasksRequest):
     """Endpoint for list_tasks MCP tool."""
-    return await list_tasks_tool(user_id, status)
+    return await list_tasks_tool(user_id=request.user_id, status=request.status)
 
 
 @app.post("/tools/complete_task")
-async def complete_task_endpoint(user_id: str, task_id: int):
+async def complete_task_endpoint(request: CompleteTaskRequest):
     """Endpoint for complete_task MCP tool."""
-    return await complete_task_tool(user_id, task_id)
+    return await complete_task_tool(user_id=request.user_id, task_id=request.task_id)
 
 
 @app.post("/tools/update_task")
-async def update_task_endpoint(user_id: str, task_id: int, title: str = None, description: str = None):
+async def update_task_endpoint(request: UpdateTaskRequest):
     """Endpoint for update_task MCP tool."""
-    return await update_task_tool(user_id, task_id, title, description)
+    return await update_task_tool(
+        user_id=request.user_id, 
+        task_id=request.task_id, 
+        title=request.title, 
+        description=request.description
+        )
 
 
 @app.post("/tools/delete_task")
-async def delete_task_endpoint(user_id: str, task_id: int):
+async def delete_task_endpoint(request: DeleteTaskRequest):
     """Endpoint for delete_task MCP tool."""
-    return await delete_task_tool(user_id, task_id)
+    return await delete_task_tool(user_id=request.user_id, task_id=request.task_id)
 
 
 @app.get("/health")

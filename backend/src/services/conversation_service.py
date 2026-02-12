@@ -19,7 +19,7 @@ class ConversationService:
     def __init__(self, session: Session):
         self.session = session
     
-    def create_conversation(self, user_id: str) -> Conversation:
+    async def create_conversation(self, user_id: str) -> Conversation:
         """
         Creates a new conversation for the given user.
         """
@@ -29,18 +29,19 @@ class ConversationService:
             updated_at=datetime.utcnow()
         )
         self.session.add(conversation)
-        self.session.commit()
-        self.session.refresh(conversation)
+        await self.session.commit()
+        await self.session.refresh(conversation)
         return conversation
     
-    def get_user_conversation(self, user_id: str) -> Optional[Conversation]:
+    async def get_user_conversation(self, user_id: str) -> Optional[Conversation]:
         """
         Gets the most recent conversation for a user, or None if no conversation exists.
         """
         statement = select(Conversation).where(Conversation.user_id == user_id).order_by(Conversation.updated_at.desc()).limit(1)
-        return self.session.exec(statement).first()
+        result = await self.session.exec(statement)
+        return result.first()
     
-    def save_message(self, conversation_id: str, user_id: str, role: str, content: str) -> Message:
+    async def save_message(self, conversation_id: str, user_id: str, role: str, content: str) -> Message:
         """
         Saves a message to the specified conversation.
         """
@@ -52,11 +53,11 @@ class ConversationService:
             created_at=datetime.utcnow()
         )
         self.session.add(message)
-        self.session.commit()
-        self.session.refresh(message)
+        await self.session.commit()
+        await self.session.refresh(message)
         return message
     
-    def get_conversation_history(self, conversation_id: str, limit: int = 20) -> List[Message]:
+    async def get_conversation_history(self, conversation_id: str, limit: int = 20) -> List[Message]:
         """
         Gets the conversation history for the given conversation ID.
         Returns the most recent messages up to the limit.
@@ -67,4 +68,5 @@ class ConversationService:
             .order_by(Message.created_at.asc())
             .limit(limit)
         )
-        return self.session.exec(statement).all()
+        result = await self.session.exec(statement)
+        return result.all()

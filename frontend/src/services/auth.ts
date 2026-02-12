@@ -91,6 +91,12 @@ export const register = async (username: string, email: string, password: string
 export const logout = (): void => {
   localStorage.removeItem('access_token');
   currentUser = null;
+
+  // Clear conversation cache on logout
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('current_conversation_id');
+    localStorage.removeItem('chat_conversations');
+  }
 };
 
 // Get token from localStorage

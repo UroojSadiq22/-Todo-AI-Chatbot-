@@ -14,6 +14,9 @@ from ..database.session import get_async_session
 from ..services.conversation_service import ConversationService
 from ..models.message import Message
 
+import os
+from groq import Groq
+
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -22,10 +25,42 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+client = Groq(api_key=os.getenv("GROQ_API_KEY", "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"))
+
+
+
 
 # MCP Server configuration
 MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:5000")
+
+
+# Utility functions for input sanitization
+def sanitize_user_input(text: str) -> str:
+    """
+    Sanitize user input to prevent injection attacks.
+
+    Args:
+        text: Raw user input
+
+    Returns:
+        Sanitized text
+    """
+    if not text:
+        return ""
+
+    # Remove null bytes and control characters (except newlines and tabs)
+    sanitized = "".join(char for char in text if char == "\n" or char == "\t" or (ord(char) >= 32 and ord(char) != 127))
+
+    # Trim excessive whitespace
+    sanitized = " ".join(sanitized.split())
+
+    # Limit length to prevent overflow attacks
+    max_length = 5000
+    if len(sanitized) > max_length:
+        sanitized = sanitized[:max_length]
+
+    return sanitized
 
 
 # Request/Response models
@@ -111,7 +146,7 @@ MCP_TOOLS = [
                         "description": "The ID of the user"
                     },
                     "task_id": {
-                        "type": "integer",
+                        "type": "string",
                         "description": "The ID of the task to complete"
                     }
                 },
@@ -132,7 +167,7 @@ MCP_TOOLS = [
                         "description": "The ID of the user"
                     },
                     "task_id": {
-                        "type": "integer",
+                        "type": "string",
                         "description": "The ID of the task to update"
                     },
                     "title": {
@@ -161,7 +196,7 @@ MCP_TOOLS = [
                         "description": "The ID of the user"
                     },
                     "task_id": {
-                        "type": "integer",
+                        "type": "string",
                         "description": "The ID of the task to delete"
                     }
                 },
@@ -265,29 +300,39 @@ async def chat_endpoint(
 
     logger.info(f"Processing chat message for user {user_id}")
 
+    # Sanitize user input
+    sanitized_message = sanitize_user_input(chat_request.message)
+
+    # Validate sanitized message is not empty
+    if not sanitized_message or sanitized_message.strip() == "":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Message cannot be empty"
+        )
+
     try:
         # Initialize conversation service
         conversation_service = ConversationService(session)
 
         # Get or create conversation
-        conversation = conversation_service.get_user_conversation(user_id)
+        conversation = await conversation_service.get_user_conversation(user_id)
         if not conversation:
             logger.info(f"Creating new conversation for user {user_id}")
-            conversation = conversation_service.create_conversation(user_id)
+            conversation = await conversation_service.create_conversation(user_id)
 
         conversation_id = conversation.id
 
-        # Save user message
-        user_message = conversation_service.save_message(
+        # Save user message (sanitized)
+        user_message = await conversation_service.save_message(
             conversation_id=conversation_id,
             user_id=user_id,
             role="user",
-            content=chat_request.message
+            content=sanitized_message
         )
         logger.info(f"Saved user message {user_message.id} to conversation {conversation_id}")
 
         # Fetch conversation history (last 20 messages)
-        history = conversation_service.get_conversation_history(conversation_id, limit=20)
+        history = await conversation_service.get_conversation_history(conversation_id, limit=20)
 
         # Format messages for OpenAI
         messages = format_messages_for_openai(history)
@@ -307,7 +352,7 @@ async def chat_endpoint(
         # Call OpenAI with function calling
         logger.info(f"Calling OpenAI API for conversation {conversation_id}")
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="llama-3.3-70b-versatile",
             messages=full_messages,
             tools=MCP_TOOLS,
             tool_choice="auto"
@@ -324,6 +369,9 @@ async def chat_endpoint(
                 tool_name = tool_call.function.name
                 import json
                 tool_arguments = json.loads(tool_call.function.arguments)
+
+                if "user_id" in tool_arguments:
+                    tool_arguments["user_id"] = user_id
 
                 logger.info(f"Calling MCP tool: {tool_name} with arguments: {tool_arguments}")
 
@@ -360,12 +408,13 @@ async def chat_endpoint(
                 tool_messages.append({
                     "role": "tool",
                     "tool_call_id": tool_call.id,
+                    "name": tool_call.function.name,
                     "content": json.dumps(tool_calls_info[i].result)
                 })
 
             # Get final response
             final_response = client.chat.completions.create(
-                model="gpt-4",
+                model="llama-3.3-70b-versatile",
                 messages=full_messages + tool_messages
             )
 
@@ -374,7 +423,7 @@ async def chat_endpoint(
             final_content = assistant_message.content or "I'm here to help with your tasks."
 
         # Save assistant response
-        assistant_msg = conversation_service.save_message(
+        assistant_msg = await conversation_service.save_message(
             conversation_id=conversation_id,
             user_id=user_id,
             role="assistant",

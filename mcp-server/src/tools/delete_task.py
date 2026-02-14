@@ -9,7 +9,7 @@ from typing import Dict, Any
 import logging
 from sqlmodel import select
 
-from backend.src.models.todo import Todo
+from src.models.todo import Todo
 from src.utils.db_utils import get_db_session
 from src.utils.response_utils import success_response, error_response
 

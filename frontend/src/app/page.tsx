@@ -207,7 +207,7 @@
 
 "use client";
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { easeOut, motion } from 'framer-motion';
 import { Bot, Sparkles, Zap, CheckCircle2, ArrowRight, Github, Star, Quote, HelpCircle, Layers, ShieldCheck, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
@@ -216,7 +216,7 @@ export default function LandingPage() {
     initial: { opacity: 0, y: 30 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true },
-    transition: { duration: 0.7, ease: "easeOut" }
+    transition: { duration: 0.7, ease: easeOut }
   };
 
   return (

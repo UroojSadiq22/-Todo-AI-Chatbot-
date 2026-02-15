@@ -443,8 +443,9 @@ const Navbar = () => {
 
   const navLinks = [
     { name: 'Features', href: '#features' },
-    { name: 'AI Agent', href: '#ai-agent' },
+    { name: 'How it Works', href: '#how-it-works' },
     { name: 'Pricing', href: '#pricing' },
+    { name: 'Contact', href: '#contact' },
   ];
 
   return (
@@ -459,7 +460,7 @@ const Navbar = () => {
             <Sparkles className="text-white w-6 h-6" />
           </div>
           <span className="text-2xl font-black tracking-tighter text-slate-900">
-            Aura<span className="text-indigo-600 font-extrabold text-[22px]">Task</span>
+            Aura<span className="text-purple-400 font-extrabold text-[22px]">Task</span>
           </span>
         </Link>
 

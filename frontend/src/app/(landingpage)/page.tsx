@@ -107,13 +107,55 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
-              <Link
-                href="/chat"
-                className="w-full sm:w-auto px-10 py-5 bg-slate-900 text-white hover:bg-indigo-600 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 shadow-2xl shadow-indigo-100 group"
-              >
-                Start Chatting{" "}
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <Link href="/">
+                <motion.div
+                  className={`group relative w-full sm:w-auto px-10 py-5 bg-slate-900 text-white rounded-2xl font-bold overflow-hidden cursor-pointer `}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {/* Animated Background Gradient */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600"
+                    initial={{ x: "-100%", opacity: 0 }}
+                    whileHover={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                  />
+
+                  {/* Shimmer Effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                    initial={{ x: "-100%" }}
+                    animate={{ x: "200%" }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "linear",
+                      repeatDelay: 1,
+                    }}
+                  />
+
+                  {/* Content */}
+                  <span className="relative flex items-center justify-center gap-2">
+                    Start Chatting
+                    <motion.span
+                      className="inline-flex"
+                      initial={{ x: 0, y: 0 }}
+                      whileHover={{ x: 5, y: -5 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </motion.span>
+                  </span>
+
+                  {/* Glow Effect */}
+                  <motion.div
+                    className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl opacity-0 blur-xl group-hover:opacity-50 transition-opacity duration-500"
+                    style={{ zIndex: -1 }}
+                  />
+                </motion.div>
               </Link>
+
               <Link
                 href="/register"
                 className="w-full sm:w-auto px-10 py-5 bg-white border border-slate-200 hover:border-rose-300 text-slate-700 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
@@ -515,7 +557,7 @@ export default function LandingPage() {
 
               {/* CTA Buttons */}
 
-              <div className="flex flex-col sm:flex-row flex-wrap w-full gap-5">
+              <div className="flex flex-col sm:flex-row items-center w-full gap-5">
                 <Link
                   href="https://uroojsadiq.vercel.app"
                   className="w-full sm:w-auto px-10 py-5 bg-white border border-slate-200 hover:border-rose-300 text-slate-700 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
@@ -523,12 +565,61 @@ export default function LandingPage() {
                   View My Work
                 </Link>
 
-                <Link
+                {/* <Link
                   href="/register"
                   className="w-full sm:w-auto px-10 py-5 bg-slate-900 text-white hover:bg-indigo-600 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 shadow-2xl shadow-indigo-100 group"
                 >
                   Get In Touch{" "}
                   <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:rotate-45 transition-transform" />
+                </Link> */}
+
+                <Link href="/register">
+                  <motion.div
+                    className={`group relative w-full sm:w-auto px-10 py-5 bg-slate-900 text-white rounded-2xl font-bold overflow-hidden cursor-pointer `}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {/* Animated Background Gradient */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600"
+                      initial={{ x: "-100%", opacity: 0 }}
+                      whileHover={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.4, ease: "easeInOut" }}
+                    />
+
+                    {/* Shimmer Effect */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                      initial={{ x: "-100%" }}
+                      animate={{ x: "200%" }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "linear",
+                        repeatDelay: 1,
+                      }}
+                    />
+
+                    {/* Content */}
+                    <span className="relative flex items-center justify-center gap-2">
+                      Get In Touch
+                      <motion.span
+                        className="inline-flex"
+                        initial={{ x: 0, y: 0 }}
+                        whileHover={{ x: 5, y: -5 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <ArrowUpRight className="w-5 h-5 group-hover:rotate-45 transition-transform" />
+                      </motion.span>
+                    </span>
+
+                    {/* Glow Effect */}
+                    <motion.div
+                      className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl opacity-0 blur-xl group-hover:opacity-50 transition-opacity duration-500"
+                      style={{ zIndex: -1 }}
+                    />
+                  </motion.div>
                 </Link>
               </div>
             </motion.div>

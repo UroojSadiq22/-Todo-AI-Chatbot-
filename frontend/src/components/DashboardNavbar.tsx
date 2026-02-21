@@ -16,7 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
-  X
+  X,
+  BarChart2
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -46,6 +47,7 @@ export default function DashboardNavbar() {
     { icon: Home, label: 'Go to Home', href: '/', color: 'text-blue-600' },
     { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', color: 'text-indigo-600' },
     { icon: CheckSquare, label: 'My Tasks', href: '/todos', color: 'text-purple-600' },
+    { icon: BarChart2, label: 'Analytics', href: '/analytics', color: 'text-purple-600' },
     { icon: MessageSquare, label: 'AI Chat', href: '/chat', color: 'text-pink-600' },
   ];
 
@@ -167,7 +169,7 @@ export default function DashboardNavbar() {
         </nav>
 
         {/* Bottom Navigation */}
-        <div className="p-4 space-y-2 border-t border-slate-200">
+        <div className="px-4 p-2 border-t border-slate-200">
           {bottomNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;

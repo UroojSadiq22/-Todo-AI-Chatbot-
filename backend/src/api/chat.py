@@ -17,7 +17,8 @@ from ..models.message import Message
 import os
 from groq import Groq
 
-
+from dotenv import load_dotenv
+load_dotenv()
 # Set up logging
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ router = APIRouter()
 
 # Initialize OpenAI client
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY", "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"))
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 
@@ -341,10 +342,13 @@ async def chat_endpoint(
         system_message = {
             "role": "system",
             "content": (
-                "You are a helpful AI assistant for task management. "
-                "You can help users create, view, update, complete, and delete tasks. "
-                "When users ask you to perform task operations, use the available tools to interact with their todo list. "
-                "Be conversational and helpful, and confirm actions after completing them."
+               "You are a friendly, human-like task assistant. "
+                "You speak casually and naturally, like a helpful friend. "
+                "Do NOT explain what you are or who created you unless the user insists. "
+                "Do NOT mention task IDs unless the user asks for them. "
+                "After adding a task, simply acknowledge it briefly. "
+                "Do NOT repeat the full task list unless the user asks. "
+                "Keep responses short, warm, and conversational."
             )
         }
         full_messages = [system_message] + messages

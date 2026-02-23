@@ -1,15 +1,22 @@
-
 "use client";
 import DashboardNavbar from "@/components/DashboardNavbar";
 import FloatingChatButton from "@/components/FloatingChatButton";
 import { AuthProvider } from "@/context/AuthContext";
 import { todoAPI } from "@/services/api";
 import {
-  Sparkles, Sun, Flame, Star, Calendar,
+  Sparkles,
+  Sun,
+  Flame,
+  Star,
+  Calendar,
+  Workflow,
+  Sunset,
+  Moon,
 } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
 import { Todo } from "@/types";
 import { AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 /* ── Date helpers ── */
 const toDateKey = (d: Date) => d.toISOString().slice(0, 10);
@@ -22,8 +29,17 @@ const lastNDays = (n: number) =>
 const getDateKey = (t: Todo) =>
   t.created_at ? toDateKey(new Date(t.created_at)) : toDateKey(new Date());
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [todos,    setTodos]    = useState<Todo[]>([]);
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+
+  // Page type detection
+  const selectedPage = pathname === "/profile" || pathname === "/settings";
+
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [greeting, setGreeting] = useState("");
 
   const fetchTodos = useCallback(async () => {
@@ -33,16 +49,45 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     } catch {}
   }, []);
 
+  const h = new Date().getHours();
+  const getGreeting = (h: number) => {
+    if (h >= 5 && h < 12)
+      return (
+        <p>
+          <Sun size={13} className="text-amber-400" />
+          Good Morning
+        </p>
+      );
+    if (h >= 12 && h < 17)
+      return (
+        <p className="flex items-center gap-1">
+          <Sun size={13} className="text-orange-400" />
+          Good Afternoon
+        </p>
+      );
+    if (h >= 17 && h < 21)
+      return (
+        <p className="flex items-center gap-1">
+          <Sunset size={13} className="text-orange-500" />
+          Good Evening
+        </p>
+      );
+    return (
+      <p className="flex items-center gap-1">
+        <Moon size={13} className="text-indigo-400" />
+        Good Night
+      </p>
+    );
+  };
+
   useEffect(() => {
-    const h = new Date().getHours();
-    setGreeting(h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening");
     fetchTodos();
     const id = setInterval(() => fetchTodos(), 30_000);
     return () => clearInterval(id);
   }, [fetchTodos]);
 
   /* ── Real streak: consecutive days ending today with ≥1 completion ── */
-  const days7    = lastNDays(7);
+  const days7 = lastNDays(7);
   const dailyDone = days7.map(
     (dk) => todos.filter((t) => t.completed && getDateKey(t) === dk).length,
   );
@@ -55,12 +100,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   /* ── Stats ── */
   const completed = todos.filter((t) => t.completed).length;
   const stats = {
-    streak,               // real streak from todos
+    streak, // real streak from todos
     points: completed * 10, // 10 XP per completed task
   };
 
-  const Pill = ({ icon, label, color }: { icon: React.ReactNode; label: string; color: string }) => (
-    <div className={`flex items-center gap-1.5 px-3 py-1.5 bg-${color}-50 border border-${color}-100 rounded-full text-xs font-bold text-${color}-600`}>
+  const Pill = ({
+    icon,
+    label,
+    color,
+  }: {
+    icon: React.ReactNode;
+    label: string;
+    color: string;
+  }) => (
+    <div
+      className={`flex items-center gap-1.5 px-3 py-1.5 bg-${color}-50 border border-${color}-100 rounded-full text-xs font-bold text-${color}-600`}
+    >
       {icon} {label}
     </div>
   );
@@ -73,43 +128,52 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* ─── Sidebar accent strip ─── */}
           <div className="fixed left-0 top-0 h-full w-1 bg-gradient-to-b from-violet-500 via-sky-400 to-emerald-400 z-50" />
 
-          {/* ════ HEADER ════ */}
-          <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600 to-sky-500 flex items-center justify-center shadow-lg shadow-violet-200">
-                <Sparkles size={22} className="text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-400 flex items-center gap-1">
-                  <Sun size={13} /> {greeting}, Champion 👋
-                </p>
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none">
-                  Focus Workspace
-                </h1>
-              </div>
-            </div>
+          {!selectedPage && (
+            <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
+              <div className="flex md:flex-row flex-col gap-3 md:pl-10 lg:pl-0">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600 to-sky-500 flex items-center justify-center shadow-lg shadow-violet-200 self-end md:self-start">
+                  <Workflow size={22} className="text-white" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-slate-400 flex items-center gap-1">
+                    {" "}
+                    {getGreeting(new Date().getHours())}, Champion 👋
+                  </div>
 
-            {/* Streak + Points pills — real data */}
-            <div className="flex items-center gap-3 flex-wrap">
-              <Pill
-                icon={<Flame size={14} className="text-orange-500" />}
-                label={stats.streak > 0 ? `${stats.streak} Day Streak 🔥` : "No streak yet"}
-                color="orange"
-              />
-              <Pill
-                icon={<Star size={14} className="text-amber-500" />}
-                label={`${stats.points} XP`}
-                color="amber"
-              />
-              <Pill
-                icon={<Calendar size={14} className="text-sky-500" />}
-                label={new Date().toLocaleDateString("en-US", {
-                  weekday: "short", month: "short", day: "numeric",
-                })}
-                color="sky"
-              />
-            </div>
-          </header>
+                  <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none">
+                    Focus Workspace
+                  </h1>
+                </div>
+              </div>
+
+              {/* Streak + Points pills — real data */}
+              <div className="flex items-center gap-3 flex-wrap">
+                <Pill
+                  icon={<Flame size={14} className="text-orange-500" />}
+                  label={
+                    stats.streak > 0
+                      ? `${stats.streak} Day Streak 🔥`
+                      : "No streak yet"
+                  }
+                  color="orange"
+                />
+                <Pill
+                  icon={<Star size={14} className="text-amber-500" />}
+                  label={`${stats.points} XP`}
+                  color="amber"
+                />
+                <Pill
+                  icon={<Calendar size={14} className="text-sky-500" />}
+                  label={new Date().toLocaleDateString("en-US", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                  color="sky"
+                />
+              </div>
+            </header>
+          )}
 
           <AnimatePresence mode="wait">{children}</AnimatePresence>
         </main>

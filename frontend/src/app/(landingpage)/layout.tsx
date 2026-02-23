@@ -1,11 +1,8 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
-
-import FloatingChatButton from '@/components/FloatingChatButton';
-import LandingNavbar from '@/components/LandingNavbar';
-
-
+import FloatingChatButton from "@/components/FloatingChatButton";
+import LandingNavbar from "@/components/LandingNavbar";
 
 export default function LandingpageLayout({
   children,
@@ -13,17 +10,11 @@ export default function LandingpageLayout({
   children: React.ReactNode;
 }) {
   return (
-    
-          <div className="min-h-screen">
-            <LandingNavbar />
-            {/* Main content */}
-            <main>
-             
-                {children}
-             
-            </main>
-            <FloatingChatButton />
-          </div>
-        
+    <div className="min-h-screen">
+      <LandingNavbar />
+      {/* Main content */}
+      <main>{children}</main>
+      <FloatingChatButton />
+    </div>
   );
 }

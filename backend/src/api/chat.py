@@ -342,13 +342,33 @@ async def chat_endpoint(
         system_message = {
             "role": "system",
             "content": (
-               "You are a friendly, human-like task assistant. "
-                "You speak casually and naturally, like a helpful friend. "
-                "Do NOT explain what you are or who created you unless the user insists. "
-                "Do NOT mention task IDs unless the user asks for them. "
-                "After adding a task, simply acknowledge it briefly. "
-                "Do NOT repeat the full task list unless the user asks. "
-                "Keep responses short, warm, and conversational."
+                "You are AuraTask — a warm, witty, and supportive personal AI assistant. "
+                "You help users manage their tasks like a smart, caring friend would — not like a corporate helpdesk bot.\n\n"
+
+                "PERSONALITY:\n"
+                "- Conversational, warm, and encouraging. Use casual but smart language.\n"
+                "- Empathetic: if someone has a lot on their plate, acknowledge it.\n"
+                "- Light humor is welcome when appropriate.\n"
+                "- Remember what was said earlier in the conversation and refer back naturally.\n\n"
+
+                "STRICT RULES — NEVER BREAK THESE:\n"
+                "- NEVER show task IDs, UUIDs, or any internal technical data to the user. Ever.\n"
+                "- NEVER list all tasks after every action. Only show tasks if the user explicitly asks.\n"
+                "- After adding a task: give a short, warm confirmation. Example: 'Done! \"Make dinner\" is on your list 🍳'\n"
+                "- After completing a task: celebrate briefly. Example: 'Nice, knocked that one out! ✅'\n"
+                "- After deleting a task: keep it simple. Example: 'Gone! One less thing to worry about.'\n"
+                "- Keep responses SHORT. 1-3 sentences max for simple actions.\n"
+                "- Never start with 'Certainly!', 'Of course!', 'Sure!', or 'Great!' — just respond naturally.\n"
+                "- Never use bullet points for simple confirmations — only use them when actually listing tasks.\n\n"
+
+                "WHEN LISTING TASKS:\n"
+                "- Format as a clean numbered list with just the task title.\n"
+                "- Add a brief motivating comment at the end if there are many tasks.\n\n"
+
+                "ABOUT YOURSELF:\n"
+                "- You are AuraTask AI, built to help people stay organized and productive.\n"
+                "- If asked who created you, say you're created by Urooj Sadiq, a Full Stack Web Developer. Also highlight some skills and features about her.\n"
+                "- Don't claim to be ChatGPT, Claude, or any other AI.\n"
             )
         }
         full_messages = [system_message] + messages
@@ -451,3 +471,85 @@ async def chat_endpoint(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to process chat message: {str(e)}"
         )
+
+
+
+# ── GET /api/{user_id}/conversations ────────────────────────────
+@router.get("/{user_id}/conversations")
+async def get_conversations(
+    user_id: str,
+    limit: int = 20,
+    offset: int = 0,
+    current_user_id: str = Depends(get_current_user_id),
+    session: AsyncSession = Depends(get_async_session)
+):
+    """Get all conversations for a user."""
+    if user_id != current_user_id:
+        raise HTTPException(status_code=403, detail="You can only access your own conversations")
+
+    try:
+        conversation_service = ConversationService(session)
+        conversation = await conversation_service.get_user_conversation(user_id)
+
+        if not conversation:
+            return {"conversations": [], "total": 0, "limit": limit, "offset": offset}
+
+        # Count messages in conversation
+        history = await conversation_service.get_conversation_history(conversation.id, limit=1000)
+
+        return {
+            "conversations": [
+                {
+                    "id": conversation.id,
+                    "user_id": conversation.user_id,
+                    "created_at": conversation.created_at.isoformat(),
+                    "updated_at": conversation.updated_at.isoformat(),
+                    "message_count": len(history)
+                }
+            ],
+            "total": 1,
+            "limit": limit,
+            "offset": offset
+        }
+    except Exception as e:
+        logger.error(f"Error fetching conversations: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to fetch conversations: {str(e)}")
+
+
+# ── GET /api/{user_id}/conversations/{conversation_id}/messages ─
+@router.get("/{user_id}/conversations/{conversation_id}/messages")
+async def get_conversation_messages(
+    user_id: str,
+    conversation_id: str,
+    limit: int = 50,
+    offset: int = 0,
+    current_user_id: str = Depends(get_current_user_id),
+    session: AsyncSession = Depends(get_async_session)
+):
+    """Get messages for a specific conversation."""
+    if user_id != current_user_id:
+        raise HTTPException(status_code=403, detail="You can only access your own conversations")
+
+    try:
+        conversation_service = ConversationService(session)
+        messages = await conversation_service.get_conversation_history(conversation_id, limit=limit)
+
+        return {
+            "messages": [
+                {
+                    "id": str(msg.id),
+                    "conversation_id": str(msg.conversation_id),
+                    "user_id": str(msg.user_id),
+                    "role": msg.role,
+                    "content": msg.content,
+                    "created_at": msg.created_at.isoformat()
+                }
+                for msg in messages
+            ],
+            "total": len(messages),
+            "limit": limit,
+            "offset": offset
+        }
+    except Exception as e:
+        logger.error(f"Error fetching messages: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to fetch messages: {str(e)}")

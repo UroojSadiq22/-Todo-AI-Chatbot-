@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { AnimatePresence, motion } from 'framer-motion';
-import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
-import { usePathname } from 'next/navigation';
-import { 
-  Home, 
-  LayoutDashboard, 
-  CheckSquare, 
+import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { usePathname } from "next/navigation";
+import {
+  Home,
+  LayoutDashboard,
+  CheckSquare,
   MessageSquare,
   User,
   Settings,
@@ -17,9 +17,9 @@ import {
   ChevronRight,
   Menu,
   X,
-  BarChart2
-} from 'lucide-react';
-import { useEffect, useState } from 'react';
+  BarChart2,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function DashboardNavbar() {
   const { user, logout } = useAuth();
@@ -37,35 +37,55 @@ export default function DashboardNavbar() {
         setMobileOpen(false); // Close mobile menu
       }
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const navItems = [
-    { icon: Home, label: 'Go to Home', href: '/', color: 'text-blue-600' },
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', color: 'text-indigo-600' },
-    { icon: CheckSquare, label: 'My Tasks', href: '/todos', color: 'text-purple-600' },
-    { icon: BarChart2, label: 'Analytics', href: '/analytics', color: 'text-purple-600' },
-    { icon: MessageSquare, label: 'AI Chat', href: '/chat', color: 'text-pink-600' },
+    { icon: Home, label: "Home", href: "/", accent: "#6366f1" },
+    {
+      icon: LayoutDashboard,
+      label: "Dashboard",
+      href: "/dashboard",
+      accent: "#7c3aed",
+    },
+    { icon: CheckSquare, label: "My Tasks", href: "/todos", accent: "#8b5cf6" },
+    {
+      icon: BarChart2,
+      label: "Analytics",
+      href: "/analytics",
+      accent: "#0ea5e9",
+    },
+    {
+      icon: MessageSquare,
+      label: "Chat History",
+      href: "/chat",
+      accent: "#06b6d4",
+    },
   ];
 
   const bottomNavItems = [
-    { icon: User, label: 'Profile', href: '/profile', color: 'text-slate-600' },
-    { icon: Settings, label: 'Settings', href: '/settings', color: 'text-slate-600' },
+    { icon: User, label: "Profile", href: "/profile", color: "text-slate-600" },
+    {
+      icon: Settings,
+      label: "Settings",
+      href: "/settings",
+      color: "text-slate-600",
+    },
   ];
 
-  const handleNavClick = () => {
+  const close = () => {
     if (isMobile) {
       setMobileOpen(false); // Close mobile menu after click
     }
   };
+  const initial = (user?.name || user?.email || "U")[0].toUpperCase();
 
   return (
     <>
-
-     {/* Mobile Menu Button */}
+      {/* Mobile Menu Button */}
       {isMobile && (
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -78,11 +98,10 @@ export default function DashboardNavbar() {
           )}
         </button>
       )}
-      
+
       {/* Mobile Backdrop */}
       <AnimatePresence>
         {isMobile && mobileOpen && (
-           
           <motion.div
             className="fixed inset-0 bg-black/50 z-40 lg:hidden"
             initial={{ opacity: 0 }}
@@ -90,21 +109,25 @@ export default function DashboardNavbar() {
             exit={{ opacity: 0 }}
             onClick={() => setMobileOpen(false)}
           />
-       
-        )} </AnimatePresence>
+        )}{" "}
+      </AnimatePresence>
       {/* Sidebar */}
       <motion.div
         className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 flex flex-col z-40 ${
-          isMobile 
-            ? mobileOpen ? 'translate-x-0' : '-translate-x-full'
-            : collapsed ? 'w-20' : 'w-64'
+          isMobile
+            ? mobileOpen
+              ? "translate-x-0"
+              : "-translate-x-full"
+            : collapsed
+              ? "w-20"
+              : "w-64"
         }`}
         style={{
-          width: isMobile ? '280px' : collapsed ? '80px' : '256px'
+          width: isMobile ? "280px" : collapsed ? "80px" : "256px",
         }}
         animate={{
-          width: isMobile ? '280px' : collapsed ? 80 : 256,
-          x: isMobile ? (mobileOpen ? 0 : -280) : 0
+          width: isMobile ? "280px" : collapsed ? 80 : 256,
+          x: isMobile ? (mobileOpen ? 0 : -280) : 0,
         }}
         transition={{ duration: 0.3 }}
       >
@@ -112,7 +135,7 @@ export default function DashboardNavbar() {
         <div className="p-6 border-b border-slate-200 flex items-center justify-between">
           {(!collapsed || isMobile) && (
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 bg-gradient-to-tr from-indigo-600 to-rose-500 rounded-xl flex items-center justify-center shadow-lg">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-black tracking-tight">
@@ -120,7 +143,7 @@ export default function DashboardNavbar() {
               </span>
             </Link>
           )}
-          
+
           {collapsed && !isMobile && (
             <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg mx-auto">
               <Sparkles className="w-5 h-5 text-white" />
@@ -128,86 +151,130 @@ export default function DashboardNavbar() {
           )}
         </div>
 
-        {/* User Profile */}
+        {/* ── User card ── */}
         {(!collapsed || isMobile) && user && (
-          <div className="p-6 border-b border-slate-200">
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mx-3 mt-4 p-3 rounded-2xl bg-gradient-to-br from-violet-50 to-indigo-50 border border-violet-100"
+          >
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                {user.name?.[0]?.toUpperCase() || 'U'}
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-sm flex-shrink-0">
+                {initial}
               </div>
-              <div className="flex-1 overflow-hidden">
-                <p className="font-bold text-slate-900 truncate">{user.name}</p>
-                <p className="text-xs text-slate-500">Pro Member</p>
+              <div className="overflow-hidden">
+                <p className="text-sm font-bold text-slate-800 truncate leading-tight">
+                  {user.name || "Champion"}
+                </p>
+                <p className="text-[10px] font-semibold text-violet-500 uppercase tracking-wide">
+                  Pro Member
+                </p>
               </div>
             </div>
+          </motion.div>
+        )}
+
+        {collapsed && !isMobile && user && (
+          <div className="mx-auto mt-4 w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-sm">
+            {initial}
           </div>
         )}
 
-        {/* Main Navigation */}
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-            
+        {/* ── Main nav ── */}
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          {navItems.map(({ icon: Icon, label, href, accent }) => {
+            const active = pathname === href;
             return (
-              <Link key={item.href} href={item.href}>
+              <Link key={href} href={href} onClick={close}>
                 <motion.div
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 shadow-sm'
-                      : 'text-slate-600 hover:bg-slate-50'
+                  whileHover={{ x: 3 }}
+                  whileTap={{ scale: 0.97 }}
+                  className={`relative flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all cursor-pointer group ${
+                    active
+                      ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-200 ml-1"
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
                   }`}
-                  whileHover={{ scale: 1.02, x: 4 }}
-                  whileTap={{ scale: 0.98 }}
                 >
-                  <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? item.color : ''}`} />
-                  {(!collapsed || isMobile) && <span className="truncate">{item.label}</span>}
+                  {/* active left bar */}
+                  {active && (
+                    <motion.div
+                      layoutId="activeBar"
+                      className="absolute -left-3 top-2 bottom-2 w-1 rounded-r-full bg-violet-400"
+                    />
+                  )}
+                  <Icon
+                    size={18}
+                    className="flex-shrink-0"
+                    style={!active ? { color: accent } : {}}
+                  />
+                  {(!collapsed || isMobile) && (
+                    <span className="text-sm font-semibold truncate">
+                      {label}
+                    </span>
+                  )}
+                  {collapsed && !isMobile && (
+                    <div className="absolute left-full ml-3 px-2.5 py-1 bg-slate-900 text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                      {label}
+                    </div>
+                  )}
                 </motion.div>
               </Link>
             );
           })}
         </nav>
 
-        {/* Bottom Navigation */}
-        <div className="px-4 p-2 border-t border-slate-200">
-          {bottomNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-            
+        {/* ── Divider ── */}
+        <div className="mx-4 h-px bg-slate-100" />
+
+        {/* ── Bottom nav ── */}
+        <div className="px-3 py-3 space-y-0.5">
+          {bottomNavItems.map(({ icon: Icon, label, href }) => {
+            const active = pathname === href;
             return (
-              <Link key={item.href} href={item.href}>
+              <Link key={href} href={href} onClick={close}>
                 <motion.div
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-slate-100 text-slate-900'
-                      : 'text-slate-600 hover:bg-slate-50'
+                  whileHover={{ x: 3 }}
+                  whileTap={{ scale: 0.97 }}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all cursor-pointer group ${
+                    active
+                      ? "bg-slate-100 text-slate-900"
+                      : "text-slate-400 hover:bg-slate-50 hover:text-slate-700"
                   }`}
-                  whileHover={{ scale: 1.02, x: 4 }}
-                  whileTap={{ scale: 0.98 }}
                 >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  {(!collapsed || isMobile) && <span className="truncate">{item.label}</span>}
+                  <Icon size={17} className="flex-shrink-0" />
+                  {(!collapsed || isMobile) && (
+                    <span className="text-sm font-semibold truncate">
+                      {label}
+                    </span>
+                  )}
+                  {collapsed && !isMobile && (
+                    <div className="absolute left-full ml-3 px-2.5 py-1 bg-slate-900 text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                      {label}
+                    </div>
+                  )}
                 </motion.div>
               </Link>
             );
           })}
 
-          {/* Logout Button */}
+          {/* Logout */}
           <motion.button
             onClick={() => {
               logout();
-              handleNavClick();
+              close();
             }}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-rose-600 hover:bg-rose-50 transition-all"
-            whileHover={{ scale: 1.02, x: 4 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ x: 3 }}
+            whileTap={{ scale: 0.97 }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-rose-400 hover:bg-rose-50 hover:text-rose-600 transition-all group"
           >
-            <LogOut className="w-5 h-5 flex-shrink-0" />
-            {(!collapsed || isMobile) && <span className="truncate">Logout</span>}
+            <LogOut size={17} className="flex-shrink-0" />
+            {(!collapsed || isMobile) && (
+              <span className="text-sm font-semibold">Logout</span>
+            )}
           </motion.button>
         </div>
 
-          {/* Desktop Collapse Toggle (Hidden on Mobile) */}
+        {/* Desktop Collapse Toggle (Hidden on Mobile) */}
         {!isMobile && (
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -223,7 +290,7 @@ export default function DashboardNavbar() {
       </motion.div>
 
       {/* Spacer for content (to prevent overlap) */}
-      <div className={`${collapsed ? 'w-20' : 'w-64'} flex-shrink-0`} />
+      <div className={`${collapsed ? "w-20" : "w-64"} flex-shrink-0`} />
     </>
   );
 }

@@ -69,7 +69,7 @@ const SettingsPage: React.FC = () => {
       <div className="space-y-6 max-w-3xl">
 
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="pl-16 md:pl-12 lg:pl-0">
           <h2 className="text-2xl font-black text-slate-800 flex items-center gap-2">
             <Settings size={22} className="text-violet-600" /> Settings
           </h2>

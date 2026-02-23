@@ -113,7 +113,7 @@ export default function DashboardNavbar() {
       </AnimatePresence>
       {/* Sidebar */}
       <motion.div
-        className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 flex flex-col z-40 ${
+        className={`fixed left-0 top-0 h-full bg-white border-r border-slate-200 flex flex-col z-40 ${
           isMobile
             ? mobileOpen
               ? "translate-x-0"

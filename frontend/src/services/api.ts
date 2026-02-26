@@ -4,7 +4,7 @@ import axios, { AxiosResponse } from 'axios';
 import { Todo, TodoCreate, TodoUpdate } from '../types';
 
 // Base API URL from environment
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
 // Create axios instance with default config
 const api = axios.create({

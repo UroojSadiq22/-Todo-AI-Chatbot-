@@ -83,10 +83,14 @@ async def list_tasks_tool(
             query = select(Todo).where(Todo.user_id == user_id)
 
             # Add status filter if provided
-            if status == "pending":
+            if status == "all":
+                query = query
+            elif status == "pending":
                 query = query.where(Todo.completed == False)
             elif status == "completed":
                 query = query.where(Todo.completed == True)
+            
+
 
             # Order by created_at descending (newest first)
             query = query.order_by(Todo.created_at.desc())

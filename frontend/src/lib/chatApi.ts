@@ -18,7 +18,7 @@ export async function sendMessage(
   request: SendMessageRequest
 ): Promise<SendMessageResponse> {
   const response = await apiClient.post<SendMessageResponse>(
-    `/api/${userId}/chat`,
+    `/${userId}/chat`,
     request
   );
   return response.data;
@@ -49,7 +49,7 @@ export async function loadConversationHistory(
     total: number;
     limit: number;
     offset: number;
-  }>(`/api/${userId}/conversations/${conversationId}/messages`, {
+  }>(`/${userId}/conversations/${conversationId}/messages`, {
     params: { limit, offset: 0 }
   });
 
